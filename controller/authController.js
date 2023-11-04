@@ -1,6 +1,8 @@
 import userModel from "../Models/userModel.js";
 import { comparePassword, hashPassword } from "../helpers/authHelper.js";
 import JWT from "jsonwebtoken";
+import nodemailer from 'nodemailer';
+// import uuid from ('node-uuid');
 
 
 export const registerController = async (req, res) => {
@@ -165,3 +167,107 @@ export const forgotPasswordController = async (req, res) => {
 export const testController = (req, res) => {
     res.send("Protected Route")
 };
+
+export const emailOTPVerification = async (req, res) => {
+
+
+     const OTP = async (req, res) => {
+        try {
+
+    
+            const otpStorage = new Map();
+            const {email} = req.params;
+            const otp = generateOTP();
+    
+            //configure Nodemailer with your email service providers
+    
+            const transporter = nodemailer.createTransport({
+                service: 'app.mailjet.com',
+                auth: {
+                     user: 'kumarrvee@gmail.com',
+                     pass: '321Hustl3'
+                }
+            });
+    
+            //generate a  random 6 digit otp
+    
+            function generateOTP() {
+                return Math.floor(100000 + Math.random() * 900000);
+            }
+    
+            //send an OTP to the user's email
+    
+            function sendOTPByEmail (email, otp) {
+                 const mailOptions = {
+                    from: 'kumarrvee@gmail.com',
+                    to: email,
+                    subject: 'OTP Verification',
+                    text: `Your OTP is: ${otp}`
+                 };
+    
+                 return new Promise((resolve, reject) => {
+                    transporter.sendMail(mailOptions, (error, info) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve('Email sent: ' + info.response);
+                        }
+                    });
+                 });
+            }
+    
+            
+    otpStorage.set(email, otp);
+
+    sendOTPByEmail(email, otp).then((result) => {
+        console.log(result);
+        res.json({message: 'OTP Sent Successfully'})
+    }).catch ((error) => {
+        console.error(error);
+        res.status(500).json({ error: "Failed to send OTP"});
+    });
+
+} catch (error) {
+    console.log(error)
+}
+}
+
+}
+
+//update user profile
+
+export const updateProfileCOntroller = async (req, res) => {
+    try {
+        
+        const {name, address, phone, email, password} = req.body;
+        const user = await userModel.findById(req.user._id);
+
+        //password
+        if(!password && password.length < 6) {
+            return res.json({error: 'Password Is Required and Should Be of Atleast 6 Characters '});
+        } else {
+            const hashedPassword = password ? await hashPassword(password) : undefined;
+            const updatedUser = await userModel.findByIdAndUpdate(req.user._id, {
+                name: name || user.name,
+                email: email || user.email,
+                phone: phone || user.phone,
+                password: hashedPassword || user.password,
+                address: address || user.address
+            }, {new: true})
+            res.status(200).send({
+                success: true,
+                message: 'Successfully Updated User Profile',
+                updatedUser
+            });
+        }
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).send({
+            success: false,
+            message: "Error While Updating User",
+            error
+        })
+    }
+}
