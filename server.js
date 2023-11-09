@@ -8,6 +8,7 @@ import authRoute from './Routes/authRoute.js';
 import cors from 'cors';
 import categoryRoute from './Routes/categoryRoute.js';
 import productRoute from './Routes/productRoute.js';
+import paymentRoute from './Routes/paymentRoute.js';
 
 dotenv.config();
 
@@ -27,9 +28,10 @@ app.use(morgan('dev'))
 app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/category', categoryRoute);
 app.use('/api/v1/products', productRoute);
+app.use('/api/v1/payment', paymentRoute);
 
-app.get('/', (req, res)=> {
-    res.send("<h1>Welcome To ecom web</h1>")
+app.get('/api/get-key', (req, res)=> {
+    res.status(200).send({key: process.env.ROZAR_PAY_KEY_ID})
 });
 
 app.listen(PORT, (req, res)=> {
