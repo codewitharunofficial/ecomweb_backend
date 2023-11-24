@@ -1,20 +1,13 @@
 import slugify from "slugify";
 import productModel from "../Models/productModel.js";
 import fs from 'fs';
-<<<<<<< HEAD
-=======
-// import braintree from "braintree";
->>>>>>> 6d7702120a703ecef032c1c79eea69887d7dd930
 import Razorpay from "razorpay";
 import OrderModel from "../Models/OrderModel.js";
 import dotenv, { config } from 'dotenv';
 
-<<<<<<< HEAD
 import * as crypto from 'crypto'
 import PaymentModel from "../Models/PaymentModel.js";
 
-=======
->>>>>>> 6d7702120a703ecef032c1c79eea69887d7dd930
 
 dotenv.config();
 
@@ -30,20 +23,6 @@ const rozarpayInstance = new Razorpay({
 
 
 
-<<<<<<< HEAD
-=======
-//payment gateway
-
-// let gateway = new braintree.BraintreeGateway({
-//   environment: braintree.Environment.Sandbox,
-//   merchantId: process.env.BRAINTREE_MERCHANT_ID,
-//   publicKey: process.env.BRAINTREE_PUBLIC_KEY,
-//   privateKey: process.env.BRAINTREE_PRIVATE_KEY,
-// });
-
-
-
->>>>>>> 6d7702120a703ecef032c1c79eea69887d7dd930
 export const createProductController = async (req, res) => {
 
   try {
@@ -409,11 +388,6 @@ export const searchProductController = async (req, res) => {
 //               payment: results,
 //               buyers: req.user._id,
 //             }).save();
-<<<<<<< HEAD
-
-=======
-              
->>>>>>> 6d7702120a703ecef032c1c79eea69887d7dd930
 //             res.json({ok: true})
 //            } else {
 //             res.status(500).send(err)
@@ -421,11 +395,6 @@ export const searchProductController = async (req, res) => {
 //       }
 //     }
 //     )
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> 6d7702120a703ecef032c1c79eea69887d7dd930
 //   } catch (error) {
 //     console.log(error)
 //   }
@@ -433,25 +402,16 @@ export const searchProductController = async (req, res) => {
 // }
 
 export const paymentController = async (req, res) => {
-<<<<<<< HEAD
 
   const { cart } = req.body;
   const { auth } = req.body;
   let total = 0
   cart.map((i) => (total += i.price));
-=======
-    
-       const {cart} = req.body;
-       const {auth} = req.body;
-       let total = 0
-    cart.map( (i) => (total += i.price));
->>>>>>> 6d7702120a703ecef032c1c79eea69887d7dd930
 
   rozarpayInstance.orders.create(
     {
       amount: Number(total * 100), // The amount in paisa (e.g., 1000 = ₹10.00)
       currency: 'INR', // Use the appropriate currency code
-<<<<<<< HEAD
 
     },
     async (err, order) => {
@@ -475,25 +435,6 @@ export const paymentController = async (req, res) => {
           Order
         });
 
-=======
-      
-    },
-    (err, order) => {
-      if (!err) {
-         res.status(200).send({
-             success: true,
-             message: "Order Created Successfully",
-             key_id: process.env.ROZAR_PAY_KEY_ID,
-             product_name: cart.name,
-             product_description: cart.description,
-             Mobile_No : auth?.user?.phone,
-             name: auth?.user?.name,
-             email: auth?.user?.email,
-             order
-
-         });
-       
->>>>>>> 6d7702120a703ecef032c1c79eea69887d7dd930
       } else {
         res.status(500).send({
           success: false,
@@ -504,7 +445,6 @@ export const paymentController = async (req, res) => {
       // Once you have the order details, you can use them to open the Razorpay payment dialog.
     }
   );
-<<<<<<< HEAD
 
 }
 
@@ -539,17 +479,3 @@ export const paymentVerification = async (req, res) => {
   }
 }
 
-=======
-  
-}
-
-export const paymentVerification = async (req, res) => {
-     console.log(req.body);
-
-     res.status(200).send({
-      success: true,
-     });
-}
-
-
->>>>>>> 6d7702120a703ecef032c1c79eea69887d7dd930
