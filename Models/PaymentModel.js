@@ -12,7 +12,12 @@ const PaymentSchema = new mongoose.Schema({
     signature : {
         type: String,
     },
-    
+
+    status : {
+        type: String,
+        default : "Initiated",
+        enum: ["Succeed", "Failed"]
+    } 
 
 }, {timestamps: true});
 

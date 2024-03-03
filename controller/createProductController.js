@@ -292,7 +292,7 @@ export const productCountController = async (req, res) => {
 export const productListController = async (req, res) => {
   try {
 
-    const perPage = 3;
+    const perPage = 6;
     const page = req.params.page ? req.params.page : 1;
 
     const products = await productModel.find({}).select("-photo").skip((page - 1) * perPage).limit(perPage).sort({ createdAt: -1 });
@@ -403,22 +403,20 @@ export const searchProductController = async (req, res) => {
 
 export const paymentController = async (req, res) => {
 
-  const { cart } = req.body;
-  const { auth } = req.body;
+  const { cart, auth } = req.body;
   let total = 0
   cart.map((i) => (total += i.price));
 
   rozarpayInstance.orders.create(
     {
-      amount: Number(total * 100), // The amount in paisa (e.g., 1000 = ₹10.00)
-      currency: 'INR', // Use the appropriate currency code
-
+      amount: Number(total * 100), 
+      currency: 'INR', 
     },
     async (err, order) => {
-
       const Order = await new OrderModel({
         products: cart,
-        buyers: auth?.user._id
+        buyers: auth?.user,
+        buyerId: auth?.user?._id
       }).save();
 
       if (!err) {
@@ -460,9 +458,11 @@ export const paymentVerification = async (req, res) => {
     if (razorpay_signature === expectedSign) {
       //Database
       const payment = await new PaymentModel({
-        orderId: razorpay_order_id, paymentId: razorpay_payment_id, signature : razorpay_signature
-      }).save()
-       
+        orderId: razorpay_order_id, paymentId: razorpay_payment_id, signature : razorpay_signature, status: 'Succeed'
+      }).save();
+      
+      const order = await OrderModel.find({payment: 'Completed'});
+
       res.status(200).send({
         success: true,
         message: "Payment Completed Successfully",
