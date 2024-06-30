@@ -5,7 +5,7 @@ import { requireSignIn } from '../middlewares/authMiddleware.js';
 const router = express.Router();
 
 
-router.get('/all-orders', requireSignIn ,getOrderController)
+router.post('/all-orders', requireSignIn ,getOrderController)
 
 
 export default router

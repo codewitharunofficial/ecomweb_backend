@@ -409,7 +409,7 @@ export const paymentController = async (req, res) => {
 
   rozarpayInstance.orders.create(
     {
-      amount: Number(total * 100), 
+      amount: Number(total * 100),
       currency: 'INR', 
     },
     async (err, order) => {
@@ -449,24 +449,25 @@ export const paymentController = async (req, res) => {
 export const paymentVerification = async (req, res) => {
 
   try {
-
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-    const signature = razorpay_order_id + "|" + razorpay_payment_id;
+     console.log(req.body);
+    const { response, Order_Id } = req.body;
+    const signature = response?.razorpay_order_id + "|" + response?.razorpay_payment_id;
 
     const expectedSign = crypto.createHmac("sha256", process.env.ROZAR_PAY_SECRET_KEY).update(signature.toString()).digest("hex");
 
-    if (razorpay_signature === expectedSign) {
+    if (response?.razorpay_signature === expectedSign) {
       //Database
       const payment = await new PaymentModel({
-        orderId: razorpay_order_id, paymentId: razorpay_payment_id, signature : razorpay_signature, status: 'Succeed'
+        orderId: response.razorpay_order_id, paymentId: response?.razorpay_payment_id, signature : response?.razorpay_signature, status: 'Succeed'
       }).save();
       
-      const order = await OrderModel.find({payment: 'Completed'});
+      const order = await OrderModel.findByIdAndUpdate({_id: Order_Id}, {payment: 'Completed'}, {new: true});
 
       res.status(200).send({
         success: true,
         message: "Payment Completed Successfully",
-        payment
+        payment,
+        order
       })
     }
 

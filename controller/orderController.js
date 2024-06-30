@@ -2,9 +2,10 @@ import OrderModel from "../Models/OrderModel.js";
 
 
 export const getOrderController = async (req, res) => {
-
+    console.log(req.body);
+           const {userId} = req.body;
         try {
-            const Order = await OrderModel.find({buyers: req.user._id}).populate("products", "-photo").populate("buyers", 'name').sort({ createdAt: "-1"});
+            const Order = await OrderModel.find({buyerId: userId}).populate("products", "-photo").populate("buyers", 'name').sort({ createdAt: "-1"});
         res.status(200).send({
             success: true,
             message: "Orders Fecthing Successfull",
